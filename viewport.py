@@ -15,8 +15,6 @@ class obj_viewport(pyglet.window.Window):
         self.lightfv = ctypes.c_float * 4
         self.rotation = 0
         self.file_name = ""
-
-        self.loaded = False
         self.render_mode = GL_TRIANGLES
         self.mesh = None
 
@@ -35,21 +33,21 @@ class obj_viewport(pyglet.window.Window):
                                                     ('c3B', [100,200,200, 200,100,100, 100,200,100, 200,100,200]))
 
     def on_draw(self):
-        
+
         to_draw = self.mesh
 
         self.clear()
         glLoadIdentity()
 
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightfv(-40, 200, 100, 0.0))
-        glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightfv(0.2, 0.2, 0.2, 1.0))
+        glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightfv(0.8, 0.8, 0.8, 1.0))
         glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightfv(0.5, 0.5, 0.5, 1.0))
-        
+
         glEnable(GL_LIGHT0)
         glEnable(GL_LIGHTING)
         glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_DEPTH_TEST)
-        
+
         glShadeModel(GL_SMOOTH)
         glMatrixMode(GL_MODELVIEW)
 
@@ -58,11 +56,11 @@ class obj_viewport(pyglet.window.Window):
         glRotatef(0, 0, 0, 1)
         glRotatef(self.rotation, 0, 1, 0)
         glRotatef(45, 1, 0, 0)
-        
+
         to_draw.draw()
 
     def on_resize(self, width, height):
-        
+
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
