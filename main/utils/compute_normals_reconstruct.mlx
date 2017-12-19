@@ -1,0 +1,21 @@
+<!DOCTYPE FilterScript>
+<FilterScript>
+ <filter name="Compute normals for point sets">
+  <Param description="Neighbour num" tooltip="The number of neighbors used to estimate normals." value="10" type="RichInt" name="K"/>
+  <Param description="Smooth Iteration" tooltip="The number of smoothing iteration done on the p used to estimate and propagate normals." value="0" type="RichInt" name="smoothIter"/>
+  <Param description="Flip normals w.r.t. viewpoint" tooltip="If the 'viewpoint' (i.e. scanner position) is known, it can be used to disambiguate normals orientation, so that all the normals will be oriented in the same direction." value="false" type="RichBool" name="flipFlag"/>
+  <Param z="0" description="Viewpoint Pos." tooltip="The viewpoint position can be set by hand (i.e. getting the current viewpoint) or it can be retrieved from mesh camera, if the viewpoint position is stored there." type="RichPoint3f" y="0" x="0" name="viewPos"/>
+ </filter>
+ <xmlfilter name="Screened Poisson Surface Reconstruction">
+  <xmlparam value="0" name="cgDepth"/>
+  <xmlparam value="false" name="confidence"/>
+  <xmlparam value="8" name="depth"/>
+  <xmlparam value="5" name="fullDepth"/>
+  <xmlparam value="8" name="iters"/>
+  <xmlparam value="4" name="pointWeight"/>
+  <xmlparam value="false" name="preClean"/>
+  <xmlparam value="1.5" name="samplesPerNode"/>
+  <xmlparam value="1.1" name="scale"/>
+  <xmlparam value="false" name="visibleLayer"/>
+ </xmlfilter>
+</FilterScript>
