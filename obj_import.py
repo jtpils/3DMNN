@@ -22,7 +22,7 @@ if __name__ == "__main__":
     triangles = []
 
     triangle = []
-    for i, vertex in enumerate(obj_vertices,start = 0):
+    for i, vertex in enumerate(obj_vertices, start = 0):
         triangle.append(vertex)
         if i % 3 == 0:
             trianglesCount += 1
