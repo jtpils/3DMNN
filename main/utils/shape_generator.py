@@ -33,7 +33,7 @@ def cube_coords_generator(scale=1, symmetry=False):
         for i in range(0, len(lower_plane)):
             x = (rand.randint(0, 100)/100)*scale
             z = (rand.randint(0, 100)/100)*scale
-            lower_plane[i] = { "x": x_, "y": lowest_point, "z": z_}
+            lower_plane[i] = { "x": x, "y": lowest_point, "z": z}
 
     print(lower_plane)
     print(upper_plane)
@@ -47,10 +47,6 @@ def cube_obj_wrapper(coords, name="object"):
         lines += "v " + str(coords[i]["x"]) + " " + str(coords[i]["y"]) + " " + str(coords[i]["z"]) + " #" + str(i + 1) + "\n"
     # Пълно шано, е това свързване, едно по едно ги пробвах.
     lines += 'f 2 1 3 4\nf 6 5 7 8\nf 1 2 7 8\nf 3 4 5 6\nf 2 4 5 7\nf 1 3 6 8'
-    print(lines)    
-    file = open(name+".obj", "w")
-    file.write(lines)
-    file.close()
     return lines
 
 
