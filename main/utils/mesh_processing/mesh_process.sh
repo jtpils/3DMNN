@@ -7,12 +7,12 @@ objects=$(ls ../../../data/concept)
 here=$pwd
 
 cd ../../../data/concept
+script=../../main/utils/mesh_processing/catmull_subdivision.mlx
 i=0
 for object in $objects; do
     input=$object
     output=../concept_processed/$object
-    script=../../main/utils/mesh_processing/catmull_subdivision.mlx
-    meshlabserver -i $input -o $output -s $script
+    meshlabserver -i $input -o $output -s $script &> /dev/null
     let i+=1
     echo "$i"
 done
