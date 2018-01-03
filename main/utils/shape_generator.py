@@ -12,6 +12,7 @@ def cube_coords_generator(scale=1, symmetry=False):
 
     z_1 = rand.randint(50, 100)/100
     x_1 = rand.randint(0, 50)/100
+    
     x_2 = rand.randint(0, 50)/100
     z_2 = rand.randint(50, 100)/100
 
@@ -42,12 +43,8 @@ def cube_coords_generator(scale=1, symmetry=False):
 def cube_obj_wrapper(coords, name="object"):
 
     lines = ""
-    
     for i in range(0, len(coords)):
         lines += "v " + str(coords[i]["x"]) + " " + str(coords[i]["y"]) + " " + str(coords[i]["z"]) + " #" + str(i + 1) + "\n"
     # Пълно шано, е това свързване, едно по едно ги пробвах.
     lines += 'f 2 1 3 4\nf 6 5 7 8\nf 1 2 7 8\nf 3 4 5 6\nf 2 4 5 7\nf 1 3 6 8'
     return lines
-
-
-cube_obj_wrapper(cube_coords_generator(symmetry=True))
