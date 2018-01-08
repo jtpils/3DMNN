@@ -103,3 +103,4 @@ ENV/
 # other ignores
 /data/*
 shapenet-viewer/
+*.npy

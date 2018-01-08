@@ -7,15 +7,33 @@ objects=$(ls ../../../data/concept)
 here=$pwd
 
 cd ../../../data/concept
-script=../../main/utils/mesh_processing/catmull_subdivision.mlx
-i=0
+# script=../../main/utils/mesh_processing/catmull_subdivision.mlx
+# i=0
+# for object in $objects; do
+#     input=$object
+#     output=../concept_processed/$object
+#     meshlabserver -i $input -o $output -s $script &> /dev/null
+#     let i+=1
+#     echo "$i"
+# done
+
+echo "Done applying algorithms."
+sleep 1
+echo "Extracting vertices..."
+
+cd ../concept_processed
+objects=$(ls)
+
+read -p "Press [Enter] key to start vertex extraction."
+
 for object in $objects; do
-    input=$object
-    output=../concept_processed/$object
-    meshlabserver -i $input -o $output -s $script &> /dev/null
-    let i+=1
-    echo "$i"
+    csplit -z $object /'7778 vertices, 0 vertices normals'/ {*} -f $object
 done
-cd $here
+
+echo "Deleting unnnesseccesary files..."
+
+rm cube*.obj01
+rm cube*.obj
 
 echo "Done."
+cd $here
