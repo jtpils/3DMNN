@@ -2,7 +2,7 @@ from gan_utils import *
 
 if __name__ == "__main__":
     print("[*] Starting DCGAN.")
-    #train(200, 20, True)
-    generate(1)
+    train(1000, 20, False)
+    #generate(1)
 
 
