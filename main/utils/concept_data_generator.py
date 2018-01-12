@@ -9,5 +9,5 @@ if __name__ == "__main__":
     if not sys.argv[1] == None: objects = int(sys.argv[1])
     for i in range(0, objects):
         file = open("./../../data/concept/cube" + str(i) + ".obj", "w")
-        file.write(wrapper(generator(symmetry=True)))
+        file.write(wrapper(generator(cube=True)))
         file.close()

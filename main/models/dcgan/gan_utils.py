@@ -9,7 +9,9 @@ from keras.layers.convolutional import UpSampling3D, UpSampling2D
 from keras.layers import Conv3D, Conv2D, AveragePooling2D, AveragePooling3D, Dense, Dropout, LeakyReLU
 from keras.layers import MaxPooling2D, MaxPooling3D, Conv2DTranspose, Input
 from keras.layers.core import Flatten
+from keras.callbacks import TensorBoard
 from keras.optimizers import SGD, Adam
+from plotter import LossAccPlotter
 from keras import utils
 
 import pywavefront as pw
@@ -24,7 +26,7 @@ ks.set_image_dim_ordering("tf")
 
 def update_progress(progress, step=0.001,string="",loss=False):
     #ignore this pls, pure bullshit, but it looks good in the terminal.
-    print("\r"+string+" [{0}] {1}%".format('#'*int(progress/10 if loss else progress/200), int(progress + 1 if loss else progress/20)), end="")
+    print("\r"+string+" [{0}] {1}%".format('#'*int(progress/10 if loss else progress/500), int(progress + 1 if loss else progress/50)), end="")
     time.sleep(step)
 
 
@@ -35,53 +37,59 @@ def load_data():
     else:
         print("Loading data...")  
         data=[]
-        for i in range(0,2000):
+        for i in range(0,5000):
             directory =  '/home/viktorv/Projects/MachineLearning/CiD/data/concept_processed/cube'+str(i)+'.obj00'
             data.append((pw.ObjParser(pw.Wavefront(directory), directory).vertices))
             update_progress(i)
         #endfor
         data = np.array(data)
-        data = np.resize(data.shape, (2000, 9025, 3)).reshape((2000, 95, 95, 3))
+       #data = np.resize(data.shape, (5, 9025, 3)).reshape((2000, 95, 95, 3))
         data.dump(open('dataArray.npy', 'wb'))
     #endif
+    # print(data.shape)
+    data = data.reshape((data.shape[0], data.shape[1], data.shape[2], 1))
+    print(data.shape)
+
     print("Loading complete!")
 
     return data
 
-def generator_model():
-    model = Sequential()
 
+def generator_model(_1d=False):
+    model = Sequential()
+    #TODO: Try 1D Input and Output, idk.
     depth = 32
-    
+    dropout_rate = 0.2
+
     model.add(Dense(128, input_shape=(128,)))
     model.add(Reshape((1,1,128), input_shape=(128,)))
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))    
+    model.add(Dropout(dropout_rate))    
 
-    model.add(Conv2DTranspose(depth*8,(4,4)))
+    model.add(Conv2DTranspose(depth*8,(4)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))   
+    model.add(Dropout(dropout_rate))   
 
-    model.add(Conv2DTranspose(depth*4,(4,4), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth*4,(4), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
     
-    model.add(Conv2DTranspose(depth*2,(4,4), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth*2,(4), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
-    model.add(Conv2DTranspose(depth,(5,5), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth,(5), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
-    model.add(Conv2DTranspose(int(depth/2), (5,5), strides=(2, 2)))    
+    model.add(Conv2DTranspose(int(depth/2), (5), strides=(2, 2)))    
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
     model.add(Conv2D(3,(3,3)))
     model.add(Activation('tanh'))
@@ -90,37 +98,39 @@ def generator_model():
 
     return model
 
-def discriminator_model():
+
+def discriminator_model(_1d=False):
     model = Sequential()
 
+    dropout_rate = 0.2
     depth = 32
 
-    model.add(Dense(depth, input_shape=(95,95,3,)))
-    model.add(BatchNormalization())      
+    model.add(Dense(depth, input_shape=(7779,3,1,)))
+    model.add(BatchNormalization())
     model.add(LeakyReLU(alpha=0.2))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth, (3,3)))
+    model.add(Conv2D(depth, (3,1)))
     model.add(BatchNormalization())  
     model.add(LeakyReLU(alpha=0.2))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth*2, (3,3)))
+    model.add(Conv2D(depth*2, (3,1)))
     model.add(BatchNormalization())    
     model.add(LeakyReLU(alpha=0.2))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth*4, (3,3)))
+    model.add(Conv2D(depth*4, (3,1)))
     model.add(BatchNormalization())
     model.add(LeakyReLU(alpha=0.2))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout_rate))
     
-    model.add(Conv2D(depth*8, (3,3)))
+    model.add(Conv2D(depth*8, (3,1)))
     model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    
+    model.add(LeakyReLU(alpha=0.2))    
+    model.add(Dropout(dropout_rate))
+
     model.add(Flatten())
-    model.add(Activation('relu'))
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
 
@@ -139,10 +149,18 @@ def generator_containing_discriminator(generator, discriminator):
 
 def train(epochs, BATCH_SIZE, load=False):
 
+    plotter = LossAccPlotter(title="DCGAN Adversary plot",
+                         save_to_filepath="./plots/my_plot.png",
+                         show_averages=True,
+                         show_loss_plot=True,
+                         x_label="Index")
     X_train = load_data()
 
     discriminator = discriminator_model()
     generator = generator_model()
+
+    tbCallBack = TensorBoard(log_dir='graph', histogram_freq=5, write_graph=True, write_images=True)
+    tbCallBack.set_model(generator)
 
     if load:
         generator.load_weights('goodgenerator.h5')
@@ -150,13 +168,11 @@ def train(epochs, BATCH_SIZE, load=False):
     
     discriminator_on_generator = generator_containing_discriminator(generator, discriminator)
 
-    d_optim = SGD(lr=0.0002, momentum=0.9, nesterov=True)
+    d_optim = SGD(lr=0.0002, momentum=0.5)
     g_optim = Adam(lr=0.0002, beta_1=0.5)
 
     generator.compile(loss='binary_crossentropy', optimizer="sgd")
-
     discriminator_on_generator.compile(loss='binary_crossentropy', optimizer=g_optim)
-
     discriminator.trainable = True
     discriminator.compile(loss='binary_crossentropy', optimizer=d_optim)
 
@@ -184,12 +200,14 @@ def train(epochs, BATCH_SIZE, load=False):
             g_loss = discriminator_on_generator.train_on_batch(noise, [1] * BATCH_SIZE)
             discriminator.trainable = True
 
-            update_progress(index, loss=True, string="Epoch: %d Batch: %d Dloss: %f Gloss: %f" % (epoch, index, d_loss, g_loss))        
+            update_progress(index, loss=True, string="Epoch: %d Batch: %d Dloss: %f Gloss: %f" % (epoch, index, d_loss, g_loss))
+            plotter.add_values(index + BATCH_SIZE*epoch, loss_train=d_loss, loss_val=g_loss)
 
             if epoch % 10 == 9:
                 generator.save_weights('goodgenerator.h5', True)
                 discriminator.save_weights('gooddiscriminator.h5', True)
         print()
+
 
 def obj_wrapper(coords, name="object"):
     lines = ""
@@ -198,7 +216,8 @@ def obj_wrapper(coords, name="object"):
     
     return lines
 
-def generate(BATCH_SIZE):
+
+def generate(BATCH_SIZE,name="generated"):
     generator = generator_model()
     generator.compile(loss='binary_crossentropy', optimizer="adam")
     generator.load_weights('goodgenerator.h5')
@@ -209,13 +228,13 @@ def generate(BATCH_SIZE):
     grad = (b - a) / BATCH_SIZE
 
     for i in range(BATCH_SIZE):
-        noise[i, :] =  np.random.normal(-1, 1, 128)
+        noise[i, :] = np.random.normal(-1, 1, 128)
 
     generated = generator.predict(noise)
 
     for pointcloud in generated:
-        pointcloud=pointcloud.reshape(9025,3)
-        file = open("./generated.obj", "w")
+        #pointcloud = pointcloud.reshape(9025,3)
+        file = open('./generated_data/%s.obj'%name, "w")
         file.write(obj_wrapper(pointcloud))
         file.close()
         
