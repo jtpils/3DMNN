@@ -43,11 +43,12 @@ def load_data():
             update_progress(i)
         #endfor
         data = np.array(data)
-       #data = np.resize(data.shape, (5, 9025, 3)).reshape((2000, 95, 95, 3))
         data.dump(open('dataArray.npy', 'wb'))
     #endif
     # print(data.shape)
-    data = data.reshape((data.shape[0], data.shape[1], data.shape[2], 1))
+    #data = data.reshape((data.shape[0], data.shape[1], data.shape[2], 1))
+    data = np.resize(data.shape, (5000, 9025, 3)).reshape((5000, 95, 95, 3))
+    
     print(data.shape)
 
     print("Loading complete!")
@@ -59,34 +60,34 @@ def generator_model(_1d=False):
     model = Sequential()
     #TODO: Try 1D Input and Output, idk.
     depth = 32
-    dropout_rate = 0.2
+    dropout_rate = 0.4
 
     model.add(Dense(128, input_shape=(128,)))
     model.add(Reshape((1,1,128), input_shape=(128,)))
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))    
 
-    model.add(Conv2DTranspose(depth*8,(4)))
+    model.add(Conv2DTranspose(depth*8,(4,4)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))   
 
-    model.add(Conv2DTranspose(depth*4,(4), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth*4,(4,4), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))
     
-    model.add(Conv2DTranspose(depth*2,(4), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth*2,(4,4), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))
 
-    model.add(Conv2DTranspose(depth,(5), strides=(2, 2)))
+    model.add(Conv2DTranspose(depth,(5,5), strides=(2, 2)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))
 
-    model.add(Conv2DTranspose(int(depth/2), (5), strides=(2, 2)))    
+    model.add(Conv2DTranspose(int(depth/2), (5,5), strides=(2, 2)))    
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(dropout_rate))
@@ -102,30 +103,30 @@ def generator_model(_1d=False):
 def discriminator_model(_1d=False):
     model = Sequential()
 
-    dropout_rate = 0.2
     depth = 32
-
-    model.add(Dense(depth, input_shape=(7779,3,1,)))
+    dropout_rate = 0.4
+    
+    model.add(Dense(depth, input_shape=(95,95,3,)))
     model.add(BatchNormalization())
     model.add(LeakyReLU(alpha=0.2))
     model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth, (3,1)))
+    model.add(Conv2D(depth, (3,3)))
     model.add(BatchNormalization())  
     model.add(LeakyReLU(alpha=0.2))
     model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth*2, (3,1)))
+    model.add(Conv2D(depth*2, (3,3)))
     model.add(BatchNormalization())    
     model.add(LeakyReLU(alpha=0.2))
     model.add(Dropout(dropout_rate))
 
-    model.add(Conv2D(depth*4, (3,1)))
+    model.add(Conv2D(depth*4, (3,3)))
     model.add(BatchNormalization())
     model.add(LeakyReLU(alpha=0.2))
     model.add(Dropout(dropout_rate))
     
-    model.add(Conv2D(depth*8, (3,1)))
+    model.add(Conv2D(depth*8, (3,3)))
     model.add(BatchNormalization())
     model.add(LeakyReLU(alpha=0.2))    
     model.add(Dropout(dropout_rate))
@@ -168,10 +169,10 @@ def train(epochs, BATCH_SIZE, load=False):
     
     discriminator_on_generator = generator_containing_discriminator(generator, discriminator)
 
-    d_optim = SGD(lr=0.0002, momentum=0.5)
+    d_optim = SGD(lr=0.0002, momentum=0.7)
     g_optim = Adam(lr=0.0002, beta_1=0.5)
 
-    generator.compile(loss='binary_crossentropy', optimizer="sgd")
+    generator.compile(loss='binary_crossentropy', optimizer="adam")
     discriminator_on_generator.compile(loss='binary_crossentropy', optimizer=g_optim)
     discriminator.trainable = True
     discriminator.compile(loss='binary_crossentropy', optimizer=d_optim)
