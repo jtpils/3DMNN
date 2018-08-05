@@ -1,5 +1,6 @@
 import os
 import random as rand
+import sys
 
 def cube_coords_generator(scale=1, symmetry=True, cube=False):
     # [x, y, z]
@@ -75,4 +76,10 @@ def cube_obj_wrapper(coords, name="object"):
     lines += 'f 2 1 3 4\nf 6 5 7 8\nf 1 2 7 8\nf 3 4 5 6\nf 2 4 5 7\nf 1 3 6 8'
     return lines
 
-cube_obj_wrapper(cube_coords_generator(cube=True, symmetry=True))
+if __name__ == "__main__":
+    objects = 1000
+    if not sys.argv[1] == None: objects = int(sys.argv[1])
+    for i in range(0, objects):
+        file = open("./../../data/concept/cube" + str(i) + ".obj", "w")
+        file.write(cube_obj_wrapper(cube_coords_generator(cube=True)))
+        file.close()
