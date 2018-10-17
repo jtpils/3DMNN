@@ -101,7 +101,7 @@ ENV/
 .mypy_cache/
 
 # other ignores
-/data/*
+data/*
 shapenet-viewer/
 *.npy
 
