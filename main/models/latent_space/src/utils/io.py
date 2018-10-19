@@ -7,8 +7,8 @@ import re
 from six.moves import cPickle
 from multiprocessing import Pool
 
-from . general_utils import rand_rotation_matrix
-from .. external.python_plyfile.plyfile import PlyElement, PlyData
+from . utils import rand_rotation_matrix
+from . python_plyfile.plyfile import PlyElement, PlyData
 
 snc_synth_id_to_category = {
     '02691156': 'airplane',  '02773838': 'bag',        '02801938': 'basket',
@@ -32,6 +32,13 @@ snc_synth_id_to_category = {
     '04554684': 'washer',    '02858304': 'boat',       '02992529': 'cellphone'
 }
 
+def obj_wrapper(obj, id, name="object"):
+    lines = ""
+    for i, xyz in enumerate(obj):
+        lines += "v " + str(xyz[0]) + " " + str(xyz[1]) + " " + str(xyz[2]) + " #" + str(i + 1) + "\n"
+    text_file = open("./generated/" + class_name + str(id) + ".obj", "w")
+    text_file.write(lines)
+    text_file.close()
 
 def snc_category_to_synth_id():
     d = snc_synth_id_to_category
@@ -112,6 +119,7 @@ def pc_loader(f_name):
 
 def load_all_point_clouds_under_folder(top_dir, n_threads=20, file_ending='.ply', verbose=False):
     file_names = [f for f in files_in_subdirs(top_dir, file_ending)]
+    print(files_in_subdirs(top_dir, file_ending))
     pclouds, model_ids, syn_ids = load_point_clouds_from_filenames(file_names, n_threads, loader=pc_loader, verbose=verbose)
     return PointCloudDataSet(pclouds, labels=syn_ids + '_' + model_ids, init_shuffle=False)
 

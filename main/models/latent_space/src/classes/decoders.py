@@ -2,12 +2,15 @@ import tensorflow as tf
 import numpy as np
 import warnings
 
+import sys
+sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
+
 from tflearn.layers.core import fully_connected, dropout
 from tflearn.layers.conv import conv_1d, avg_pool_1d
 from tflearn.layers.normalization import batch_normalization
 from tflearn.layers.core import fully_connected, dropout
 
-from ..utils.utils import expand_scope_by_name, replicate_parameter_for_all_layers
+from utils.utils import expand_scope_by_name, replicate_parameter_for_all_layers
 
 
 def decoder_with_fc_only(latent_signal, layer_sizes=[], b_norm=True, non_linearity=tf.nn.relu,
@@ -24,7 +27,7 @@ def decoder_with_fc_only(latent_signal, layer_sizes=[], b_norm=True, non_lineari
     if n_layers < 2:
         raise ValueError('For an FC decoder with single a layer use simpler code.')
 
-    for i in xrange(0, n_layers - 1):
+    for i in range(0, n_layers - 1):
         name = 'decoder_fc_' + str(i)
         scope_i = expand_scope_by_name(scope, name)
 

@@ -5,9 +5,12 @@ import numpy as np
 
 from tflearn import is_training
 
-from . in_out import create_dir, pickle_data, unpickle_data
-from ..utils.general_utils import apply_augmentations, iterate_in_chunks
-from neural_network import NeuralNetwork
+import sys
+sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
+
+from utils.io import create_dir, pickle_data, unpickle_data
+from utils.utils import apply_augmentations, iterate_in_chunks
+from classes.neural_network import NeuralNetwork
 
 model_saver_id = 'models.ckpt'
 
@@ -56,10 +59,11 @@ class Configuration():
         return hasattr(self, attribute) and getattr(self, attribute) is not None
 
     def __str__(self):
-        keys = self.__dict__.keys()
-        vals = self.__dict__.values()
+        keys = list(self.__dict__.keys())
+        vals = list(self.__dict__.values())
         index = np.argsort(keys)
         res = ''
+
         for i in index:
             if callable(vals[i]):
                 v = vals[i].__name__
@@ -78,12 +82,12 @@ class Configuration():
         return unpickle_data(file_name + '.pickle').next()
 
 
-class AutoEncoder(Neural_Net):
+class AutoEncoder(NeuralNetwork):
     '''Basis class for a Neural Network that implements an Auto-Encoder in TensorFlow.
     '''
 
     def __init__(self, name, graph, configuration):
-        Neural_Net.__init__(self, name, graph)
+        NeuralNetwork.__init__(self, name, graph)
         self.is_denoising = configuration.is_denoising
         self.n_input = configuration.n_input
         self.n_output = configuration.n_output

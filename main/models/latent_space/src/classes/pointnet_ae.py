@@ -5,13 +5,16 @@ import os.path as osp
 from tflearn.layers.conv import conv_1d
 from tflearn.layers.core import fully_connected
 
-from ..utils.io import create_dir
-from autoencoder import AutoEncoder
-from ..utils import apply_augmentations
+import sys
+sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space")
+
+from src.utils.io import create_dir
+from src.classes.autoencoder import AutoEncoder
+from src.utils.utils import apply_augmentations
 
 try:
-    from ..cuda_losses.structural_losses.tf_nndistance import nn_distance
-    from ..cuda_losses.structural_losses.tf_approxmatch import approx_match, match_cost
+    from cuda_losses.tf_nndistance import nn_distance
+    from cuda_losses.tf_approxmatch import approx_match, match_cost
 except:
     print('External Losses (Chamfer-EMD) cannot be loaded. Please install them first.')
 

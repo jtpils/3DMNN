@@ -6,77 +6,109 @@
 #include <math.h>
 #include <string.h>
 using namespace std;
+
 float randomf(){
 	return (rand()+0.5)/(RAND_MAX+1.0);
 }
+
 static double get_time(){
 	timespec tp;
 	clock_gettime(CLOCK_MONOTONIC,&tp);
 	return tp.tv_sec+tp.tv_nsec*1e-9;
 }
+
 void approxmatch_cpu(int b,int n,int m,float * xyz1,float * xyz2,float * match){
+
 	for (int i=0;i<b;i++){
+
 		int factorl=max(n,m)/n;
 		int factorr=max(n,m)/m;
+
 		vector<double> saturatedl(n,double(factorl)),saturatedr(m,double(factorr));
 		vector<double> weight(n*m);
-		for (int j=0;j<n*m;j++)
+
+		for (int j=0;j<n*m;j++) {
 			match[j]=0;
+		}
+
 		for (int j=7;j>=-2;j--){
-			//printf("i=%d j=%d\n",i,j);
+
 			double level=-powf(4.0,j);
+
 			if (j==-2)
 				level=0;
+
 			for (int k=0;k<n;k++){
+
 				double x1=xyz1[k*3+0];
 				double y1=xyz1[k*3+1];
 				double z1=xyz1[k*3+2];
+
 				for (int l=0;l<m;l++){
+
 					double x2=xyz2[l*3+0];
 					double y2=xyz2[l*3+1];
 					double z2=xyz2[l*3+2];
+
 					weight[k*m+l]=expf(level*((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)))*saturatedr[l];
 				}
 			}
+
 			vector<double> ss(m,1e-9);
+
 			for (int k=0;k<n;k++){
 				double s=1e-9;
+
 				for (int l=0;l<m;l++){
 					s+=weight[k*m+l];
 				}
+
 				for (int l=0;l<m;l++){
 					weight[k*m+l]=weight[k*m+l]/s*saturatedl[k];
 				}
+
 				for (int l=0;l<m;l++)
 					ss[l]+=weight[k*m+l];
 			}
+
 			for (int l=0;l<m;l++){
+
 				double s=ss[l];
 				double r=min(saturatedr[l]/s,1.0);
 				ss[l]=r;
 			}
+
 			vector<double> ss2(m,0);
+
 			for (int k=0;k<n;k++){
 				double s=0;
+
 				for (int l=0;l<m;l++){
+
 					weight[k*m+l]*=ss[l];
 					s+=weight[k*m+l];
 					ss2[l]+=weight[k*m+l];
 				}
+
 				saturatedl[k]=max(saturatedl[k]-s,0.0);
 			}
+
 			for (int k=0;k<n*m;k++)
 				match[k]+=weight[k];
+
 			for (int l=0;l<m;l++){
 				saturatedr[l]=max(saturatedr[l]-ss2[l],0.0);
 			}
 		}
+
 		xyz1+=n*3;
 		xyz2+=m*3;
 		match+=n*m;
 	}
 }
+
 void matchcost_cpu(int b,int n,int m,float * xyz1,float * xyz2,float * match,float * cost){
+	
 	for (int i=0;i<b;i++){
 		double s=0;
 		for (int j=0;j<n;j++)
@@ -126,6 +158,7 @@ void matchcostgrad_cpu(int b,int n,int m,float * xyz1,float * xyz2,float * match
 void approxmatchLauncher(int b,int n,int m,const float * xyz1,const float * xyz2,float * match);
 void matchcostLauncher(int b,int n,int m,const float * xyz1,const float * xyz2,const float * match,float * out);
 void matchcostgradLauncher(int b,int n,int m,const float * xyz1,const float * xyz2,const float * match,float * grad2);
+
 int main()
 {
 	srand(101);
