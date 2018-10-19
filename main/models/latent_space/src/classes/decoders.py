@@ -89,7 +89,7 @@ def decoder_with_convs_only(in_signal, n_filters, filter_sizes, strides, padding
     strides = replicate_parameter_for_all_layers(strides, n_layers)
     dropout_prob = replicate_parameter_for_all_layers(dropout_prob, n_layers)
 
-    for i in xrange(n_layers):
+    for i in range(n_layers):
         if i == 0:
             layer = in_signal
 

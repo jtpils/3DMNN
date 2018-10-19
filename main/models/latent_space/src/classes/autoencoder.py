@@ -178,7 +178,7 @@ class AutoEncoder(NeuralNetwork):
         if c.saver_step is not None:
             create_dir(c.train_dir)
 
-        for _ in xrange(c.training_epochs):
+        for _ in range(c.training_epochs):
             loss, duration = self._single_epoch_train(train_data, c)
             epoch = int(self.sess.run(self.epoch.assign_add(tf.constant(1.0))))
             stats.append((epoch, loss, duration))
@@ -221,7 +221,7 @@ class AutoEncoder(NeuralNetwork):
 
         b = configuration.batch_size
         reconstructions = np.zeros([n_examples] + self.n_output)
-        for i in xrange(0, n_examples, b):
+        for i in range(0, n_examples, b):
             if self.is_denoising:
                 reconstructions[i:i + b], loss = self.reconstruct(feed_data[i:i + b], original_data[i:i + b])
             else:
@@ -258,7 +258,7 @@ class AutoEncoder(NeuralNetwork):
         reconstructions = np.zeros([n_examples] + self.n_output)
         losses = np.zeros([n_examples])
 
-        for i in xrange(n_examples):
+        for i in range(n_examples):
             if self.is_denoising:
                 reconstructions[i], losses[i] = self.reconstruct(feed_data[i], original_data[i])
             else:

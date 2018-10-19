@@ -32,7 +32,7 @@ snc_synth_id_to_category = {
     '04554684': 'washer',    '02858304': 'boat',       '02992529': 'cellphone'
 }
 
-def obj_wrapper(obj, id, name="object"):
+def obj_wrapper(obj, class_name, id, name="object"):
     lines = ""
     for i, xyz in enumerate(obj):
         lines += "v " + str(xyz[0]) + " " + str(xyz[1]) + " " + str(xyz[2]) + " #" + str(i + 1) + "\n"
@@ -70,7 +70,7 @@ def unpickle_data(file_name):
     '''
     inFile = open(file_name, 'rb')
     size = cPickle.load(inFile)
-    for _ in xrange(size):
+    for _ in range(size):
         yield cPickle.load(inFile)
     inFile.close()
 

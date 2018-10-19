@@ -178,35 +178,7 @@ int main()
 	double t0=get_time();
 	approxmatch_cpu(2,n,m,xyz1,xyz2,match_cpu);
 	printf("approxmatch cpu time %f\n",get_time()-t0);
-	/*for (int i=0;i<b;i++){
-		for (int j=0;j<n;j++){
-			float s=0;
-			for (int k=0;k<m;k++){
-				float u=match_cpu[i*n*m+j*m+k];
-				if (u<0 || u>1){
-					printf("bad i=%d j=%d k=%d u=%f\n",i,j,k,u);
-				}
-				s+=u;
-			}
-			if (s<0.999 || s>1.001){
-				printf("bad i=%d j=%d s=%f\n",i,j,s);
-			}
-		}
-		for (int j=0;j<m;j++){
-			float s=0;
-			for (int k=0;k<n;k++){
-				s+=match_cpu[i*n*m+k*m+j];
-			}
-			if (s<3.999 || s>4.001){
-				printf("bad i=%d j=%d s=%f\n",i,j,s);
-			}
-		}
-	}*/
-	/*for (int j=0;j<n;j++){
-		for (int k=0;k<m;k++)
-			printf("%.3f ",match_cpu[j*m+k]);
-		puts("");
-	}*/
+	
 	matchcost_cpu(2,n,m,xyz1,xyz2,match_cpu,cost_cpu);
 	matchcostgrad_cpu(2,n,m,xyz1,xyz2,match_cpu,grad_cpu);
 

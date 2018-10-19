@@ -8,6 +8,7 @@ sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
 from utils.templates import mlp_architecture_ala_iclr_18, default_train_params
 from classes.autoencoder import Configuration as Conf
 from classes.pointnet_ae import PointNetAutoEncoder
+from utils.io import obj_wrapper
 
 from utils.io import snc_category_to_synth_id, create_dir, PointCloudDataSet, \
                                         load_all_point_clouds_under_folder
@@ -22,7 +23,7 @@ n_pc_points = 2048                # Number of points per model.
 bneck_size = 128                  # Bottleneck-AE size
 ae_loss = 'emd'                   # Loss to optimize: 'emd' or 'chamfer'
 class_name="chair"
-#class_name = input('Give me the class name (e.g. "chair"): ').lower()
+class_name = input('Give me the class name (e.g. "chair"): ').lower()
 
 syn_id = snc_category_to_synth_id()[class_name]
 class_dir = osp.join(top_in_dir, syn_id)
@@ -36,7 +37,7 @@ train_dir = create_dir(osp.join(top_out_dir, experiment_name))
 
 conf = Conf(n_input = [n_pc_points, 3],
             loss = ae_loss,
-            training_epochs = 800,
+            training_epochs = 5,
             batch_size = train_params['batch_size'],
             denoising = train_params['denoising'],
             learning_rate = train_params['learning_rate'],
@@ -69,7 +70,7 @@ latent_codes = ae.transform(feed_pc)
 reconstructions = np.asarray(reconstructions)
 
 for i, reconstruction in enumerate(reconstructions[0]):
-    obj_wrapper(reconstruction, i)
+    obj_wrapper(reconstruction, class_name, i)
 
 print(reconstructions[0].shape)
 
