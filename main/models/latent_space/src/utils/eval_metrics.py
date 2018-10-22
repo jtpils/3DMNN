@@ -17,11 +17,11 @@ except:
     print('External Losses (Chamfer-EMD) cannot be loaded. Please install them first.')
  
 
-def minimum_mathing_distance_tf_graph(n_pc_points, batch_size=None, normalize=True, sess=None, verbose=False, use_sqrt=False, use_EMD=False):
+def minimum_matching_distance_tf_graph(n_pc_points, batch_size=None, normalize=True, sess=None, verbose=False, use_sqrt=False, use_EMD=False):
     ''' Produces the graph operations necessary to compute the MMD and consequently also the Coverage due to their 'symmetric' nature.
     Assuming a "reference" and a "sample" set of point-clouds that will be matched, this function creates the operation that matches
     a _single_ "reference" point-cloud to all the "sample" point-clouds given in a batch. Thus, is the building block of the function
-    ```minimum_mathing_distance`` and ```coverage``` that iterate over the "sample" batches and each "reference" point-cloud.
+    ```minimum_matching_distance`` and ```coverage``` that iterate over the "sample" batches and each "reference" point-cloud.
 
     Args:
         n_pc_points (int): how many points each point-cloud of those to be compared has.
@@ -59,11 +59,15 @@ def minimum_mathing_distance_tf_graph(n_pc_points, batch_size=None, normalize=Tr
 
     if use_EMD:
         match = approx_match(ref_repeat, sample_pl)
+
         all_dist_in_batch = match_cost(ref_repeat, sample_pl, match)
         if normalize:
             all_dist_in_batch /= n_pc_points
+
     else:
+
         ref_to_s, _, s_to_ref, _ = nn_distance(ref_repeat, sample_pl)
+
         if use_sqrt:
             ref_to_s = tf.sqrt(ref_to_s)
             s_to_ref = tf.sqrt(s_to_ref)
@@ -71,10 +75,11 @@ def minimum_mathing_distance_tf_graph(n_pc_points, batch_size=None, normalize=Tr
 
     best_in_batch = tf.reduce_min(all_dist_in_batch)   # Best distance, of those that were matched to single ref pc.
     location_of_best = tf.argmin(all_dist_in_batch, axis=0)
+    
     return ref_pl, sample_pl, best_in_batch, location_of_best, sess
 
 
-def minimum_mathing_distance(sample_pcs, ref_pcs, batch_size, normalize=True, sess=None, verbose=False, use_sqrt=False, use_EMD=False):
+def minimum_matching_distance(sample_pcs, ref_pcs, batch_size, normalize=True, sess=None, verbose=False, use_sqrt=False, use_EMD=False):
     '''Computes the MMD between two sets of point-clouds.
 
     Args:
@@ -102,7 +107,7 @@ def minimum_mathing_distance(sample_pcs, ref_pcs, batch_size, normalize=True, se
     if n_pc_points != n_pc_points_s or pc_dim != pc_dim_s:
         raise ValueError('Incompatible size of point-clouds.')
 
-    ref_pl, sample_pl, best_in_batch, _, sess = minimum_mathing_distance_tf_graph(n_pc_points, normalize=normalize,
+    ref_pl, sample_pl, best_in_batch, _, sess = minimum_matching_distance_tf_graph(n_pc_points, normalize=normalize,
                                                                                   sess=sess, use_sqrt=use_sqrt,
                                                                                   use_EMD=use_EMD)
     matched_dists = []
@@ -148,7 +153,7 @@ def coverage(sample_pcs, ref_pcs, batch_size, normalize=True, sess=None, verbose
     if n_pc_points != n_pc_points_s or pc_dim != pc_dim_s:
         raise ValueError('Incompatible Point-Clouds.')
 
-    ref_pl, sample_pl, best_in_batch, loc_of_best, sess = minimum_mathing_distance_tf_graph(n_pc_points, normalize=normalize,
+    ref_pl, sample_pl, best_in_batch, loc_of_best, sess = minimum_matching_distance_tf_graph(n_pc_points, normalize=normalize,
                                                                                             sess=sess, use_sqrt=use_sqrt,
                                                                                             use_EMD=use_EMD)
     matched_gt = []

@@ -184,44 +184,59 @@ class AutoEncoder(NeuralNetwork):
             stats.append((epoch, loss, duration))
 
             if epoch % c.loss_display_step == 0:
+                
                 print("Epoch:", '%04d' % (epoch), 'training time (minutes)=', "{:.4f}".format(duration / 60.0), "loss=", "{:.9f}".format(loss))
+                
                 if log_file is not None:
                     log_file.write('%04d\t%.9f\t%.4f\n' % (epoch, loss, duration / 60.0))
 
             # Save the models checkpoint periodically.
             if c.saver_step is not None and (epoch % c.saver_step == 0 or epoch - 1 == 0):
+                
                 checkpoint_path = osp.join(c.train_dir, model_saver_id)
                 self.saver.save(self.sess, checkpoint_path, global_step=self.epoch)
 
             if c.exists_and_is_not_none('summary_step') and (epoch % c.summary_step == 0 or epoch - 1 == 0):
+                
                 summary = self.sess.run(self.merged_summaries)
                 self.train_writer.add_summary(summary, epoch)
 
             if held_out_data is not None and c.exists_and_is_not_none('held_out_step') and (epoch % c.held_out_step == 0):
+                
                 loss, duration = self._single_epoch_train(held_out_data, c, only_fw=True)
+                
                 print("Held Out Data :", 'forward time (minutes)=', "{:.4f}".format(duration / 60.0), "loss=", "{:.9f}".format(loss))
                 if log_file is not None:
                     log_file.write('On Held_Out: %04d\t%.9f\t%.4f\n' % (epoch, loss, duration / 60.0))
+        
         return stats
 
     def evaluate(self, in_data, configuration, ret_pre_augmentation=False):
+        
         n_examples = in_data.num_examples
         data_loss = 0.
         pre_aug = None
+        
         if self.is_denoising:
+            
             original_data, ids, feed_data = in_data.full_epoch_data(shuffle=False)
             if ret_pre_augmentation:
                 pre_aug = feed_data.copy()
+            
             if feed_data is None:
                 feed_data = original_data
             feed_data = apply_augmentations(feed_data, configuration)  # This is a new copy of the batch.
+        
         else:
+            
             original_data, ids, _ = in_data.full_epoch_data(shuffle=False)
             feed_data = apply_augmentations(original_data, configuration)
 
         b = configuration.batch_size
         reconstructions = np.zeros([n_examples] + self.n_output)
+        
         for i in range(0, n_examples, b):
+            
             if self.is_denoising:
                 reconstructions[i:i + b], loss = self.reconstruct(feed_data[i:i + b], original_data[i:i + b])
             else:
@@ -229,6 +244,7 @@ class AutoEncoder(NeuralNetwork):
 
             # Compute average loss
             data_loss += (loss * len(reconstructions[i:i + b]))
+
         data_loss /= float(n_examples)
 
         if pre_aug is not None:
@@ -236,17 +252,22 @@ class AutoEncoder(NeuralNetwork):
         else:
             return reconstructions, data_loss, np.squeeze(feed_data), ids, np.squeeze(original_data)
 
+
     def evaluate_one_by_one(self, in_data, configuration):
         '''Evaluates every data point separately to recover the loss on it. Thus, the batch_size = 1 making it
         a slower than the 'evaluate' method.
         '''
 
         if self.is_denoising:
+
             original_data, ids, feed_data = in_data.full_epoch_data(shuffle=False)
+
             if feed_data is None:
                 feed_data = original_data
+
             feed_data = apply_augmentations(feed_data, configuration)  # This is a new copy of the batch.
         else:
+
             original_data, ids, _ = in_data.full_epoch_data(shuffle=False)
             feed_data = apply_augmentations(original_data, configuration)
 
@@ -272,6 +293,7 @@ class AutoEncoder(NeuralNetwork):
         Observation: the next layer after latent (z) might be something interesting.
         tensor_name: e.g. model.name + '_1/decoder_fc_0/BiasAdd:0'
         '''
+        
         batch_size = conf.batch_size
         original, ids, noise = dataset.full_epoch_data(shuffle=False)
 
@@ -287,6 +309,7 @@ class AutoEncoder(NeuralNetwork):
             feed_data = apply_augmentations(feed, conf)
 
         embedding = []
+
         if tensor_name == 'bottleneck':
             for b in iterate_in_chunks(feed_data, batch_size):
                 embedding.append(self.transform(b.reshape([len(b)] + conf.n_input)))

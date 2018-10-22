@@ -60,23 +60,30 @@ def pickle_data(file_name, *args):
     '''
     myFile = open(file_name, 'wb')
     cPickle.dump(len(args), myFile, protocol=2)
+
     for item in args:
         cPickle.dump(item, myFile, protocol=2)
+
     myFile.close()
 
 
 def unpickle_data(file_name):
     '''Restore data previously saved with pickle_data().
     '''
+
     inFile = open(file_name, 'rb')
     size = cPickle.load(inFile)
+
     for _ in range(size):
         yield cPickle.load(inFile)
+
     inFile.close()
 
 
 def files_in_subdirs(top_dir, search_pattern):
+
     regex = re.compile(search_pattern)
+
     for path, _, files in os.walk(top_dir):
         for name in files:
             full_name = osp.join(path, name)
@@ -85,6 +92,7 @@ def files_in_subdirs(top_dir, search_pattern):
 
 
 def load_ply(file_name, with_faces=False, with_color=False):
+
     ply_data = PlyData.read(file_name)
     points = ply_data['vertex']
     points = np.vstack([points['x'], points['y'], points['z']]).T
@@ -118,6 +126,7 @@ def pc_loader(f_name):
 
 
 def load_all_point_clouds_under_folder(top_dir, n_threads=20, file_ending='.ply', verbose=False):
+
     file_names = [f for f in files_in_subdirs(top_dir, file_ending)]
     print(files_in_subdirs(top_dir, file_ending))
     pclouds, model_ids, syn_ids = load_point_clouds_from_filenames(file_names, n_threads, loader=pc_loader, verbose=verbose)
@@ -125,6 +134,7 @@ def load_all_point_clouds_under_folder(top_dir, n_threads=20, file_ending='.ply'
 
 
 def load_point_clouds_from_filenames(file_names, n_threads, loader, verbose=False):
+
     pc = loader(file_names[0])[0]
     pclouds = np.empty([len(file_names), pc.shape[0], pc.shape[1]], dtype=np.float32)
     model_names = np.empty([len(file_names)], dtype=object)
@@ -188,18 +198,24 @@ class PointCloudDataSet(object):
 
         self.epochs_completed = 0
         self._index_in_epoch = 0
+
         if init_shuffle:
             self.shuffle_data()
 
     def shuffle_data(self, seed=None):
+
         if seed is not None:
             np.random.seed(seed)
+
         perm = np.arange(self.num_examples)
         np.random.shuffle(perm)
+
         self.point_clouds = self.point_clouds[perm]
         self.labels = self.labels[perm]
+
         if self.noisy_point_clouds is not None:
             self.noisy_point_clouds = self.noisy_point_clouds[perm]
+
         return self
 
     def next_batch(self, batch_size, seed=None):
@@ -207,12 +223,16 @@ class PointCloudDataSet(object):
         '''
         start = self._index_in_epoch
         self._index_in_epoch += batch_size
+
         if self._index_in_epoch > self.num_examples:
+
             self.epochs_completed += 1  # Finished epoch.
             self.shuffle_data(seed)
+
             # Start next epoch
             start = 0
             self._index_in_epoch = batch_size
+
         end = self._index_in_epoch
 
         if self.noisy_point_clouds is None:
@@ -225,23 +245,30 @@ class PointCloudDataSet(object):
         '''
         if shuffle and seed is not None:
             np.random.seed(seed)
+
         perm = np.arange(self.num_examples)  # Shuffle the data.
+
         if shuffle:
             np.random.shuffle(perm)
+
         pc = self.point_clouds[perm]
         lb = self.labels[perm]
         ns = None
+
         if self.noisy_point_clouds is not None:
             ns = self.noisy_point_clouds[perm]
+
         return pc, lb, ns
 
     def merge(self, other_data_set):
+
         self._index_in_epoch = 0
         self.epochs_completed = 0
         self.point_clouds = np.vstack((self.point_clouds, other_data_set.point_clouds))
 
         labels_1 = self.labels.reshape([self.num_examples, 1])  # TODO = move to init.
         labels_2 = other_data_set.labels.reshape([other_data_set.num_examples, 1])
+        
         self.labels = np.vstack((labels_1, labels_2))
         self.labels = np.squeeze(self.labels)
 

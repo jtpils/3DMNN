@@ -22,7 +22,7 @@ experiment_name = 'single_class_ae'
 n_pc_points = 2048                # Number of points per model.
 bneck_size = 128                  # Bottleneck-AE size
 ae_loss = 'emd'                   # Loss to optimize: 'emd' or 'chamfer'
-class_name="chair"
+
 class_name = input('Give me the class name (e.g. "chair"): ').lower()
 
 syn_id = snc_category_to_synth_id()[class_name]

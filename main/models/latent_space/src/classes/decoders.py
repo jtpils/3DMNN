@@ -60,6 +60,7 @@ def decoder_with_fc_only(latent_signal, layer_sizes=[], b_norm=True, non_lineari
     name = 'decoder_fc_' + str(n_layers - 1)
     scope_i = expand_scope_by_name(scope, name)
     layer = fully_connected(layer, layer_sizes[n_layers - 1], activation='linear', weights_init='xavier', name=name, regularizer=regularizer, weight_decay=weight_decay, reuse=reuse, scope=scope_i)
+    
     if verbose:
         print(name, 'FC params = ', np.prod(layer.W.get_shape().as_list()) + np.prod(layer.b.get_shape().as_list()))
 
@@ -67,6 +68,7 @@ def decoder_with_fc_only(latent_signal, layer_sizes=[], b_norm=True, non_lineari
         name += '_bnorm'
         scope_i = expand_scope_by_name(scope, name)
         layer = batch_normalization(layer, name=name, reuse=reuse, scope=scope_i)
+
         if verbose:
             print('bnorm params = ', np.prod(layer.beta.get_shape().as_list()) + np.prod(layer.gamma.get_shape().as_list()))
 
@@ -104,9 +106,11 @@ def decoder_with_convs_only(in_signal, n_filters, filter_sizes, strides, padding
             print(name, 'conv params = ', np.prod(layer.W.get_shape().as_list()) + np.prod(layer.b.get_shape().as_list()))
 
         if (b_norm and i < n_layers - 1) or (i == n_layers - 1 and b_norm_finish):
+
             name += '_bnorm'
             scope_i = expand_scope_by_name(scope, name)
             layer = batch_normalization(layer, name=name, reuse=reuse, scope=scope_i)
+            
             if verbose:
                 print('bnorm params = ', np.prod(layer.beta.get_shape().as_list()) + np.prod(layer.gamma.get_shape().as_list()))
 

@@ -33,7 +33,7 @@ class LatentGAN(GAN):
             self.loss_d = tf.reduce_mean(-tf.log(self.real_prob) - tf.log(1 - self.synthetic_prob))
             self.loss_g = tf.reduce_mean(-tf.log(self.synthetic_prob))
 
-            #Post ICLR TRY: safe_log
+            #try safe_log
 
             train_vars = tf.trainable_variables()
 
@@ -74,7 +74,9 @@ class LatentGAN(GAN):
 
                 # Update discriminator.
                 z = self.generator_noise_distribution(batch_size, self.noise_dim, **noise_params)
-                feed_dict = {self.gt_data: feed, self.noise: z}
+
+                # Feed dict = Ground truth data, Latent noise vector.
+                feed_dict = { self.gt_data: feed, self.noise: z }
                 loss_d, _ = self.sess.run([self.loss_d, self.opt_d], feed_dict=feed_dict)
                 loss_g, _ = self.sess.run([self.loss_g, self.opt_g], feed_dict=feed_dict)
 

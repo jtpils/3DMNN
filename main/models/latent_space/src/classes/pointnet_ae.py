@@ -87,7 +87,9 @@ class PointNetAutoEncoder(AutoEncoder):
     def _setup_optimizer(self):
         c = self.configuration
         self.lr = c.learning_rate
+
         if hasattr(c, 'exponential_decay'):
+
             self.lr = tf.train.exponential_decay(c.learning_rate, self.epoch, c.decay_steps, decay_rate=0.5, staircase=True, name="learning_rate_decay")
             self.lr = tf.maximum(self.lr, 1e-5)
             tf.summary.scalar('learning_rate', self.lr)
@@ -126,6 +128,7 @@ class PointNetAutoEncoder(AutoEncoder):
 
             # Compute average loss
             epoch_loss += loss
+            
         epoch_loss /= n_batches
         duration = time.time() - start_time
         
