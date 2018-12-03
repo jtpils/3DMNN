@@ -51,7 +51,7 @@ def iterate_in_chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-        
+  
 def add_gaussian_noise_to_pcloud(pcloud, mu=0, sigma=1):
     gnoise = np.random.normal(mu, sigma, pcloud.shape[0])
     gnoise = np.tile(gnoise, (3, 1)).T

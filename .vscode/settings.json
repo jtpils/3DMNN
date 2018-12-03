@@ -1,5 +1,7 @@
 {
     "python.linting.pylintEnabled": false,
     "python.pythonPath": "/home/viktorv/.conda/envs/3dmnn_cu9/bin/python",
-    "python.linting.pylamaEnabled": false
+    "python.linting.pylamaEnabled": false,
+    "python.linting.banditEnabled": true,
+    "python.linting.enabled": true
 }
