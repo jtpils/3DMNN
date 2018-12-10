@@ -1,14 +1,15 @@
 import os.path as osp
-import warnings
-import tensorflow as tf
 import sys
+import warnings
+
+import numpy as np
+import tensorflow as tf
+
 
 sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
 
-from utils.io import create_dir
-
+from utils.io import create_dir, pickle_data, unpickle_data
 from classes.neural_network import NeuralNetwork
-
 
 class GAN(NeuralNetwork):
 
@@ -38,3 +39,58 @@ class GAN(NeuralNetwork):
         noise = self.generator_noise_distribution(n_samples, self.noise_dim, **noise_params)
         feed_dict = {self.noise: noise}
         return self.sess.run([self.generator_out], feed_dict=feed_dict)[0]
+
+
+class ConfigurationGAN():
+
+    def __init__(self, n_input, generator, n_z, discriminator, 
+                 training_epochs=200, batch_size=10, 
+                 learning_rate=0.001, saver_step=None, train_dir=None,
+                 loss_display_step=1, debug=False, n_output=None):
+
+        # Parameters
+        self.n_input = n_input
+        self.generator = generator
+        self.discriminator = discriminator
+
+        # Training related parameters
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
+        self.loss_display_step = loss_display_step
+        self.saver_step = saver_step
+        self.train_dir = train_dir
+        self.saver_max_to_keep = saver_max_to_keep
+        self.training_epochs = training_epochs
+        self.debug = debug
+        self.n_z = n_z
+
+        if n_output is None:
+            self.n_output = n_input
+        else:
+            self.n_output = n_output
+
+    def exists_and_is_not_none(self, attribute):
+        return hasattr(self, attribute) and getattr(self, attribute) is not None
+
+    def __str__(self):
+        keys = list(self.__dict__.keys())
+        vals = list(self.__dict__.values())
+        index = np.argsort(keys)
+        res = ''
+
+        for i in index:
+            if callable(vals[i]):
+                v = vals[i].__name__
+            else:
+                v = str(vals[i])
+            res += '%30s: %s\n' % (str(keys[i]), v)
+        return res
+
+    def save(self, file_name):
+        pickle_data(file_name + '.pickle', self)
+        with open(file_name + '.txt', 'w') as fout:
+            fout.write(self.__str__())
+
+    @staticmethod
+    def load(file_name):
+        return unpickle_data(file_name + '.pickle').next()
