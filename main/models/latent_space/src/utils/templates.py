@@ -6,8 +6,17 @@ sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
 from classes.encoders import encoder_with_convs_and_symmetry
 from classes.decoders import decoder_with_fc_only
 
+from classes.generators import simple_generator
+from classes.discriminators import simple_discriminator
 
-def mlp_architecture_ala_iclr_18(n_pc_points, bneck_size, bneck_post_mlp=False):
+def innofair_architecture():
+
+    generator = simple_generator
+    discriminator = simple_discriminator
+
+    return generator, discriminator, gen_params, disc_params
+
+def autoencoder_paper(n_pc_points, bneck_size):
     ''' Single class experiments.
     '''
     if n_pc_points != 2048:
@@ -32,10 +41,6 @@ def mlp_architecture_ala_iclr_18(n_pc_points, bneck_size, bneck_post_mlp=False):
         'b_norm_finish': False,
         'verbose': True
     }
-
-    if bneck_post_mlp:
-        encoder_args['n_filters'].pop()
-        decoder_args['layer_sizes'][0] = bneck_size
 
     return encoder, decoder, encoder_args, decoder_args
 

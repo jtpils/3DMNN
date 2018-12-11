@@ -63,7 +63,6 @@ class ConfigurationGAN():
         self.loss_display_step = loss_display_step
         self.saver_step = saver_step
         self.summary_step = summary_step
-        self.train_dir = train_dir
         self.training_epochs = training_epochs
         self.debug = debug
         self.n_z = n_z
