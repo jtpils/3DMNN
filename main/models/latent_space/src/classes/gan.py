@@ -43,26 +43,32 @@ class GAN(NeuralNetwork):
 
 class ConfigurationGAN():
 
-    def __init__(self, n_input, generator, n_z, discriminator, 
-                 training_epochs=200, batch_size=10, 
-                 learning_rate=0.001, saver_step=None, train_dir=None,
-                 loss_display_step=1, debug=False, n_output=None):
+    def __init__(self, name, n_input, generator, n_z, discriminator, train_dir,
+                 training_epochs=200, batch_size=10, summary_step=None,
+                 learning_rate=0.001, saver_step=None,
+                 loss_display_step=1, debug=False, n_output=None, noise_params=None,
+                 beta=0.9
+                ):
 
         # Parameters
+        self.name = name
         self.n_input = n_input
         self.generator = generator
         self.discriminator = discriminator
-
+        
         # Training related parameters
         self.batch_size = batch_size
+        self.train_dir = train_dir
         self.learning_rate = learning_rate
         self.loss_display_step = loss_display_step
         self.saver_step = saver_step
+        self.summary_step = summary_step
         self.train_dir = train_dir
-        self.saver_max_to_keep = saver_max_to_keep
         self.training_epochs = training_epochs
         self.debug = debug
         self.n_z = n_z
+        self.noise_params = noise_params
+        self.beta = beta
 
         if n_output is None:
             self.n_output = n_input

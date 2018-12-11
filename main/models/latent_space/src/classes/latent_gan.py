@@ -10,6 +10,8 @@ from classes.gan import GAN
 from utils.utils import safe_log
 from tflearn import is_training
 from utils.io import create_dir, pickle_data, unpickle_data
+from classes.gan import ConfigurationGAN as ConfGAN
+
 
 class LatentGAN(GAN):
     def __init__(self, conf, gen_kwargs={}, disc_kwargs={}, graph=None):
@@ -17,7 +19,7 @@ class LatentGAN(GAN):
         self.name = conf.name
         self.learning_rate = conf.learning_rate
         self.n_output = conf.n_output
-        self.noise_dim = conf.noise_dim
+        self.noise_dim = conf.n_z
         self.discriminator = conf.discriminator
         self.generator = conf.generator
         self.beta = conf.beta
@@ -61,11 +63,16 @@ class LatentGAN(GAN):
     def generator_noise_distribution(self, n_samples, ndims, mu, sigma):
         return np.random.normal(mu, sigma, (n_samples, ndims))
 
-    def _single_epoch_train(self, train_data, batch_size, noise_params):
+    def _single_epoch_train(self, train_data):
+
+        batch_size = self.conf.batch_size
+        noise_params = self.conf.noise_params
+
         '''
         see: http://blog.aylien.com/introduction-generative-adversarial-networks-code-tensorflow/
              http://wiseodd.github.io/techblog/2016/09/17/gan-tensorflow/
         '''
+
         n_examples = train_data.num_examples
         epoch_loss_d = 0.
         epoch_loss_g = 0.
@@ -102,19 +109,19 @@ class LatentGAN(GAN):
         return (epoch_loss_d, epoch_loss_g), duration
 
 
-    def train(self, train_data, conf, log_file=None, held_out_data=None):
+    def train(self, train_data, log_file=None, held_out_data=None):
         
         stats = []
 
-        if conf.saver_step is not None:
-            create_dir(conf.train_dir)
+        if self.conf.saver_step is not None:
+            create_dir(self.conf.train_dir)
 
-        for _ in range(conf.training_epochs):
-            loss, duration = self._single_epoch_train(train_data, conf.batch_size, conf)
+        for _ in range(self.conf.training_epochs):
+            loss, duration = self._single_epoch_train(train_data)
             epoch = int(self.sess.run(self.epoch.assign_add(tf.constant(1.0))))
             stats.append((epoch, loss, duration))
 
-            if epoch % conf.loss_display_step == 0:
+            if epoch % self.conf.loss_display_step == 0:
                 
                 print("Epoch:", '%04d' % (epoch), 'training time (minutes)=', "{:.4f}".format(duration / 60.0), "loss=", "{:.9f}".format(loss))
                 
@@ -122,12 +129,12 @@ class LatentGAN(GAN):
                     log_file.write('%04d\t%.9f\t%.4f\n' % (epoch, loss, duration / 60.0))
 
             # Save the models checkpoint periodically.
-            if conf.saver_step is not None and (epoch % conf.saver_step == 0 or epoch - 1 == 0):
+            if self.conf.saver_step is not None and (epoch % self.conf.saver_step == 0 or epoch - 1 == 0):
                 
-                checkpoint_path = osp.join(conf.train_dir, model_saver_id)
+                checkpoint_path = osp.join(self.conf.train_dir, model_saver_id)
                 self.saver.save(self.sess, checkpoint_path, global_step=self.epoch)
 
-            if conf.exists_and_is_not_none('summary_step') and (epoch % conf.summary_step == 0 or epoch - 1 == 0):
+            if self.conf.exists_and_is_not_none('summary_step') and (epoch % self.conf.summary_step == 0 or epoch - 1 == 0):
                 
                 summary = self.sess.run(self.merged_summaries)
                 self.train_writer.add_summary(summary, epoch)
