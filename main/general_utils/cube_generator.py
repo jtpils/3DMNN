@@ -1,6 +1,7 @@
 import os
 import random as rand
 import sys
+# Absolute retardation. please spare me
 
 def cube_coords_generator(scale=1, symmetry=True, cube=False):
     # [x, y, z]
