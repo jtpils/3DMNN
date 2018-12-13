@@ -104,5 +104,6 @@ ENV/
 data/*
 shapenet-viewer/
 *.npy
+*.meta
 
 py-env/

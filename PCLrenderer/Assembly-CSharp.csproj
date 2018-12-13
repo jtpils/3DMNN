@@ -53,11 +53,18 @@
   <ItemGroup>
      <Compile Include="Assets\Pcx\PointCloudData.cs" />
      <Compile Include="Assets\Pcx\PointCloudRenderer.cs" />
+     <Compile Include="Assets\PointCloud\Scripts\EnablePointSize.cs" />
+     <Compile Include="Assets\PointCloud\Scripts\PointCloudManager.cs" />
      <Compile Include="Assets\Scripts\PCChange.cs" />
+     <Compile Include="Assets\Scripts\VerticesShow.cs" />
+     <None Include="Assets\PointCloud\Shaders\VertexColor.shader" />
      <None Include="Assets\Pcx\Shaders\Disk.shader" />
      <None Include="Assets\Pcx\Shaders\Point.shader" />
      <None Include="Assets\Pcx\Shaders\Disk.cginc" />
+     <None Include="Assets\TSF\Shaders\TSFOutline.shader" />
+     <None Include="Assets\TSF\Shaders\TSF.shader" />
      <None Include="Assets\Pcx\Shaders\Common.cginc" />
+     <None Include="Assets\PointCloud\Readme.txt" />
  <Reference Include="UnityEngine.CoreModule">
  <HintPath>/opt/UnityLts/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
  </Reference>

@@ -528,12 +528,6 @@ class PlyElement(object):
 
         properties = []
         descr = data.dtype.descr
-        ldesc = list(descr)
-        ldesc[0].pop(0)
-        descr = tuple(ldesc)
-        print(descr)
-        print(data)
-        print(name)
 
         for t in descr:
             if not isinstance(t[1], str):
