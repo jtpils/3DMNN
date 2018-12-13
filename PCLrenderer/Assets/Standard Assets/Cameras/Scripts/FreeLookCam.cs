@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace UnityStandardAssets.Cameras
 {
@@ -38,24 +40,28 @@ namespace UnityStandardAssets.Cameras
 
 	        m_PivotTargetRot = m_Pivot.transform.localRotation;
 			m_TransformTargetRot = transform.localRotation;
+
         }
 
 
         protected void Update()
-        {   
-            if(Input.GetMouseButton(1)) {
-                HandleHorizontalMovement();
-            }
+        {
+            if(!EventSystem.current.IsPointerOverGameObject()){
+                if(Input.GetMouseButton(1)) {
+                    HandleHorizontalMovement();
+                }
 
-            HandleScroll(Input.GetAxis("Mouse ScrollWheel"));
+                HandleScroll(Input.GetAxis("Mouse ScrollWheel"));
 
-            if(Input.GetMouseButton(0)) {
-                HandleRotationMovement();
-            }
-            if (m_LockCursor && Input.GetMouseButtonUp(0) )
-            {
-                Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.None;
-                Cursor.visible = !m_LockCursor;
+                if(Input.GetMouseButton(0)) {
+                    HandleRotationMovement();
+                }
+
+                if (m_LockCursor && Input.GetMouseButtonUp(0) )
+                {
+                    Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+                    Cursor.visible = !m_LockCursor;
+                }
             }
         }
 

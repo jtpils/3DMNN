@@ -8,7 +8,7 @@ from six.moves import cPickle
 from multiprocessing import Pool
 
 from . utils import rand_rotation_matrix
-from . python_plyfile.plyfile import PlyElement, PlyData
+from . plyfile import PlyElement, PlyData
 
 snc_synth_id_to_category = {
     '02691156': 'airplane',  '02773838': 'bag',        '02801938': 'basket',
