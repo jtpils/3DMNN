@@ -106,4 +106,7 @@ shapenet-viewer/
 *.npy
 *.meta
 
+model_checkpoints
+models.ckpt*
+.vscode
 py-env/
