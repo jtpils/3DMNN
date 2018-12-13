@@ -41,7 +41,7 @@ class GAN(NeuralNetwork):
         return self.sess.run([self.generator_out], feed_dict=feed_dict)[0]
 
 
-class ConfigurationGAN():
+class ConfigurationGAN:
 
     def __init__(self, name, n_input, generator, n_z, discriminator, train_dir,
                  training_epochs=200, batch_size=10, summary_step=None,

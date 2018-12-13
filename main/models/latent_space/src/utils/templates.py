@@ -9,12 +9,25 @@ from classes.decoders import decoder_with_fc_only
 from classes.generators import simple_generator
 from classes.discriminators import simple_discriminator
 
-def innofair_architecture():
+def innofair_architecture(latent_vector_size):
+
+    # TODO For future me: 
+    # Work out the classes communication with the gen_params.
 
     generator = simple_generator
     discriminator = simple_discriminator
 
-    return generator, discriminator, gen_params, disc_params
+    params = {
+        "init_lr"      : 10e-5,
+        "lambda"       : 10,
+        "n_out"        : [latent_vector_size],
+        "noise_dim"    : latent_vector_size,
+        "beta"         : 0.5,
+        "batch_size"   : 50,
+        "noise_params" : { 'mu': 0, 'sigma': 0.2 }
+    }
+
+    return generator, discriminator, params
 
 def autoencoder_paper(n_pc_points, bneck_size):
     ''' Single class experiments.

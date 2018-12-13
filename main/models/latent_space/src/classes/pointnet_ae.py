@@ -1,3 +1,4 @@
+#https://arxiv.org/pdf/1707.02392.pdf
 import time
 import tensorflow as tf
 import os.path as osp
@@ -16,12 +17,13 @@ try:
     from cuda_losses.tf_nndistance import nn_distance
     from cuda_losses.tf_approxmatch import approx_match, match_cost
 except:
-    print('External Losses (Chamfer-EMD) cannot be loaded. Please install them first.')
+    print("Error with CUDA compilation of the losses")
 
 
 class PointNetAutoEncoder(AutoEncoder):
     '''
     An Auto-Encoder for point-clouds.
+    https://arxiv.org/pdf/1707.02392.pdf
     '''
 
     def __init__(self, name, configuration, graph=None):
