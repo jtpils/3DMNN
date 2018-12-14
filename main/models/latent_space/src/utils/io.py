@@ -6,6 +6,7 @@ import os.path as osp
 import re
 from six.moves import cPickle
 from multiprocessing import Pool
+import random
 
 from . utils import rand_rotation_matrix
 from . plyfile import PlyElement, PlyData
@@ -31,6 +32,46 @@ snc_synth_id_to_category = {
     '04256520': 'sofa',      '04330267': 'stove',      '04530566': 'vessel',
     '04554684': 'washer',    '02858304': 'boat',       '02992529': 'cellphone'
 }
+
+def generate_mitsuba_xml(coords, class_name, frame):
+    
+    file='''
+    <scene version='0.6.0'>
+        <sensor type="perspective">
+            <transform name="toWorld">
+                <matrix value="-0.748005 -0.299916 -0.592064 76.1669 -0.663041 0.298141 0.68665 -75.4112 -0.0294184 0.90618 -0.421868 42.2796 0 0 0 1"/>
+            </transform>
+            <float name="fov" value="60"/>
+
+            <!-- Render with 32 samples per pixel using a basic
+            independent sampling strategy -->
+
+            <sampler type="independent">
+                <integer name="sampleCount" value="2"/>
+            </sampler>
+
+            <!-- Generate an EXR image at almost HD resolution -->
+            <film type="hdrfilm">
+                <integer name="width" value="1024"/>
+                <integer name="height" value="768"/>
+            </film>
+        </sensor> 
+    '''
+    for i, xyz in enumerate(coords):
+        file += '''
+        <shape type="sphere">
+            <transform name="toWorld">
+                <scale value="%s"/>
+                <translate x="%s" y="%s" z="%s"/>
+            </transform>
+            <bsdf type="diffuse"/>
+        </shape> \n
+        ''' % (1 + (random.randint(0,100)/100), xyz[0]*100, xyz[1]*100, xyz[2]*100)
+
+    file += "</scene>"
+    xml = open("./renders/" + str(class_name) + str(frame) + ".xml", "w")
+    xml.write(file)
+    xml.close()
 
 def obj_wrapper(obj, class_name, id, name="object"):
     lines = ""

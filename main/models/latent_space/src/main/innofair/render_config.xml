@@ -1,0 +1,9 @@
+<scene version="0.6.0">
+    <shape type="sphere">
+        <transform name="toWorld">
+            <scale value="2"/>
+            <translate x="1" y="0" z="0"/>
+        </transform>
+        <bsdf type="diffuse"/>
+    </shape>
+</scene>
