@@ -47,13 +47,13 @@ def generate_mitsuba_xml(coords, class_name, frame):
             independent sampling strategy -->
 
             <sampler type="independent">
-                <integer name="sampleCount" value="2"/>
+                <integer name="sampleCount" value="32"/>
             </sampler>
 
             <!-- Generate an EXR image at almost HD resolution -->
             <film type="hdrfilm">
-                <integer name="width" value="1024"/>
-                <integer name="height" value="768"/>
+                <integer name="width" value="1280"/>
+                <integer name="height" value="720"/>
             </film>
         </sensor> 
     '''
