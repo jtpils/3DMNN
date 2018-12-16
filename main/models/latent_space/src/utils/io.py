@@ -33,13 +33,13 @@ snc_synth_id_to_category = {
     '04554684': 'washer',    '02858304': 'boat',       '02992529': 'cellphone'
 }
 
-def generate_mitsuba_xml(coords, class_name, frame):
+def generate_mitsuba_xml(coords, class_name, frame, variation=False):
     
     file='''
     <scene version='0.6.0'>
         <sensor type="perspective">
             <transform name="toWorld">
-                <matrix value="-0.748005 -0.299916 -0.592064 76.1669 -0.663041 0.298141 0.68665 -75.4112 -0.0294184 0.90618 -0.421868 42.2796 0 0 0 1"/>
+                <matrix value="-0.748005 -0.299916 -0.592064 76.1669 -0.663041 0.298141 0.68665 -90.4112 -0.0294184 0.90618 -0.421868 42.2796 0 0 0 1"/>
             </transform>
             <float name="fov" value="60"/>
 
@@ -53,7 +53,7 @@ def generate_mitsuba_xml(coords, class_name, frame):
             <!-- Generate an EXR image at almost HD resolution -->
             <film type="hdrfilm">
                 <integer name="width" value="1280"/>
-                <integer name="height" value="720"/>
+                <integer name="height" value="1280"/>
             </film>
         </sensor> 
     '''
@@ -66,7 +66,7 @@ def generate_mitsuba_xml(coords, class_name, frame):
             </transform>
             <bsdf type="diffuse"/>
         </shape> \n
-        ''' % (1 + (random.randint(0,100)/100), xyz[0]*100, xyz[1]*100, xyz[2]*100)
+        ''' %(1 + (random.randint(0,100)/100) if variation else 1, xyz[0]*100, xyz[1]*100, xyz[2]*100)
 
     file += "</scene>"
     xml = open("./renders/" + str(class_name) + str(frame) + ".xml", "w")
