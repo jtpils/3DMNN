@@ -107,6 +107,11 @@ shapenet-viewer/
 *.meta
 
 model_checkpoints
+/main/models/latent_space/generated/*
+/main/models/latent_space/models_checkpoints/*
+/main/models/latent_space/src/main/generated
+/main/models/latent_space/src/main/models_checkpoints
+/main/models/latent_space/src/main/renders
 models.ckpt*
 .vscode
 py-env/

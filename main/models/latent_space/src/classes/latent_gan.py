@@ -14,6 +14,7 @@ from tflearn import is_training
 from utils.io import create_dir, pickle_data, unpickle_data
 from classes.gan import ConfigurationGAN as ConfGAN
 
+
 class LatentGAN(GAN):
     # Gradient Penalty https://arxiv.org/abs/1704.00028
     def __init__(self, name, learning_rate, lam, n_output, noise_dim, discriminator, generator, beta=0.5, gen_kwargs={}, disc_kwargs={}, graph=None):

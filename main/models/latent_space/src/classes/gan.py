@@ -11,18 +11,20 @@ sys.path.append("/home/viktorv/Projects/3DMNN/main/models/latent_space/src")
 from utils.io import create_dir, pickle_data, unpickle_data
 from classes.neural_network import NeuralNetwork
 
+model_saver_id = 'models.ckpt'
+
 class GAN(NeuralNetwork):
 
     def __init__(self, name, graph):
         NeuralNetwork.__init__(self, name, graph)
 
     def save_model(self, tick):
-        self.saver.save(self.sess, self.MODEL_SAVER_ID, global_step=tick)
+        self.saver.save(self.sess, model_saver_id, global_step=tick)
 
     def restore_model(self, model_path, epoch, verbose=False):
         '''Restore all the variables of a saved model.
         '''
-        self.saver.restore(self.sess, osp.join(model_path, self.MODEL_SAVER_ID + '-' + str(int(epoch))))
+        self.saver.restore(self.sess, osp.join(model_path, model_saver_id + '-' + str(int(epoch))))
 
         if self.epoch.eval(session=self.sess) != epoch:
             warnings.warn('Loaded model\'s epoch doesn\'t match the requested one.')
