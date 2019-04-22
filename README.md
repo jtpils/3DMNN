@@ -4,4 +4,5 @@ The ideas explored here have been already explored to a huge extent in https://a
 # TODO:
 Think about another ways to improving the state-of-the-art
 
+A more production ready code is available at the Daedalus repo.
 
